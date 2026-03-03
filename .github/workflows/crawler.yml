@@ -1,64 +1,65 @@
-name: MCPE资源自动爬取与更新
+# 每周自动爬取MCPE资源并部署到GitHub Pages
+name: 每周MCPE资源更新
 
-# 触发条件
 on:
-  # 定时触发：每天凌晨2点运行（UTC时间，对应北京时间10点）
   schedule:
-    - cron: '0 2 * * *'
-  
-  # 手动触发：方便测试
+    - cron: '0 0 * * 1'
   workflow_dispatch:
-  
-  # 当推送代码到main分支时也触发（可选）
-  push:
-    branches: [ main ]
-    paths:
-      - 'scripts/**'
-      - '.github/workflows/**'
 
-# 权限设置
 permissions:
   contents: write
   pages: write
   id-token: write
 
-# 任务定义
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  crawl-and-update:
+  crawl-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     
     steps:
-      # 1. 拉取代码
       - name: 拉取仓库代码
         uses: actions/checkout@v4
       
-      # 2. 设置Python环境
       - name: 配置Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          cache: 'pip'  # 缓存pip依赖加速构建
+          cache: 'pip'
       
-      # 3. 安装依赖
       - name: 安装Python依赖
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
-      # 4. 运行爬虫抓取数据
       - name: 执行爬虫抓取
         run: python scripts/crawler.py
         env:
-          # 如果需要API密钥，从GitHub Secrets获取
-          API_KEY: ${{ secrets.API_KEY }}
-          # 可以设置代理等环境变量
           USER_AGENT: "Mozilla/5.0 (compatible; MCPE-Crawler/1.0)"
       
-      # 5. 更新网站数据（如果需要额外处理）
-      - name: 处理并更新网站数据
+      - name: 处理网站数据
         run: python scripts/update_site.py
       
-      # 6. 检查data目录是否有变化
+      # ✅ 新增：验证生成的文件
+      - name: 验证数据文件
+        run: |
+          echo "📁 检查 data 目录："
+          ls -la data/
+          echo ""
+          echo "📄 site_data.json 统计："
+          if [ -f data/site_data.json ]; then
+            echo "文件大小: $(wc -c < data/site_data.json) 字节"
+            echo "资源数量: $(grep -o '"name"' data/site_data.json | wc -l)"
+          else
+            echo "❌ site_data.json 不存在！"
+            exit 1
+          fi
+      
       - name: 检查数据更新
         id: check_changes
         run: |
@@ -71,22 +72,22 @@ jobs:
             echo "🔄 检测到数据更新"
           fi
       
-      # 7. 提交更新后的数据到仓库
       - name: 提交数据更新
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git commit -m "🤖 自动更新MCPE资源数据 $(date '+%Y-%m-%d %H:%M:%S')"
+          git commit -m "🤖 自动更新MCPE资源数据 $(date '+%Y-%m-%d')"
           git push
       
-      # 8. 部署到GitHub Pages（可选）
-      - name: 部署到GitHub Pages
-        if: success()
-        uses: peaceiris/actions-gh-pages@v3
+      - name: 配置Pages
+        uses: actions/configure-pages@v5
+      
+      - name: 上传Pages产物
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          publish_branch: gh-pages
-          keep_files: true
-          exclude_assets: '.github,scripts,requirements.txt,README.md'
+          path: '.'
+      
+      - name: 部署到GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
