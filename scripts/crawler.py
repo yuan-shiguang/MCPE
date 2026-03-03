@@ -24,14 +24,6 @@ class MCPECrawler:
         # 从导航栏提取的精确分类链接
         self.category_urls = [
             '/download/',    # Minecraft APK
-            '/mods/',        # 模组
-            '/servers/',     # 服务器
-            '/textures/',    # 纹理
-            '/shaders/',     # 着色器
-            '/maps/',        # 地图
-            '/skins/',       # 皮肤
-            '/seeds/',       # 种子
-            '/soft/',        # 软
         ]
         
         os.makedirs(self.data_dir, exist_ok=True)
