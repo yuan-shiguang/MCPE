@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCPE资源库 - 我的世界手机版下载</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 头部样式 */
+        .header {
+            background: rgba(255,255,255,0.95);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header h1 i {
+            color: #4CAF50;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .stats {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .stats span {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 1.2em;
+        }
+        
+        /* 分类标签 */
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .category-tag {
+            background: #fff;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .category-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .category-tag.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #45a049;
+        }
+        
+        .category-tag span {
+            font-size: 0.8em;
+            opacity: 0.8;
+            margin-left: 5px;
+        }
+        
+        /* 搜索框 */
+        .search-box {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 30px;
+            font-size: 1em;
+            transition: all 0.3s;
+            margin: 0 auto 20px;
+            display: block;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76,175,80,0.3);
+        }
+        
+        /* 资源网格 */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        /* 资源卡片 */
+        .resource-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .resource-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 3px solid #4CAF50;
+        }
+        
+        .resource-info {
+            padding: 15px;
+            flex: 1;
+        }
+        
+        .resource-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .resource-meta {
+            font-size: 0.85em;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        
+        .resource-meta span {
+            background: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-right: 5px;
+        }
+        
+        .resource-desc {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .download-btn {
+            display: block;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 6px;
+            margin: 15px;
+            transition: all 0.3s;
+        }
+        
+        .download-btn:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            box-shadow: 0 5px 15px rgba(76,175,80,0.4);
+        }
+        
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: white;
+            font-size: 1.2em;
+        }
+        
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 底部 */
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+        
+        .footer a {
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px dotted rgba(255,255,255,0.5);
+        }
+        
+        .update-time {
+            background: rgba(0,0,0,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        /* 错误提示 */
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 30px 0;
+        }
+    </style>
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-cube"></i> 
+                MCPE资源库
+                <i class="fas fa-mobile-alt"></i>
+            </h1>
+            <p>我的世界手机版 | 模组 | 地图 | 皮肤 | 每日自动更新</p>
+            <div class="stats" id="stats">
+                加载中...
+            </div>
+        </div>
+        
+        <!-- 搜索和筛选 -->
+        <div class="categories" id="categories">
+            <!-- 分类会通过JS动态加载 -->
+        </div>
+        
+        <input type="text" class="search-box" id="searchInput" 
+               placeholder="🔍 搜索资源名称或描述...">
+        
+        <!-- 资源网格 -->
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner"></i> 正在加载资源...
+        </div>
+        
+        <div id="resourceGrid" class="resource-grid" style="display: none;">
+            <!-- 卡片会通过JS动态生成 -->
+        </div>
+        
+        <!-- 底部 -->
+        <div class="footer">
+            <p>⭐ 资源每日自动更新 | 仿MCPAKS风格 | 数据仅供参考</p>
+            <p class="update-time" id="updateTime">更新时间: 加载中...</p>
+            <p>© 2024 MCPE资源库 | <a href="#">关于</a> | <a href="#">反馈</a></p>
+        </div>
+    </div>
+    
+    <script>
+        // 加载数据
+        let allResources = [];
+        let categories = {};
+        
+        async function loadData() {
+            try {
+                const response = await fetch('data/site_data.json');
+                if (!response.ok) {
+                    throw new Error('数据加载失败');
+                }
+                const data = await response.json();
+                
+                allResources = data.resources || [];
+                categories = data.categories || {};
+                
+                // 更新统计信息
+                document.getElementById('stats').innerHTML = 
+                    `<span>📊 今日更新 ${data.total_count || 0} 个资源</span>`;
+                
+                // 更新时间戳
+                if (data.last_update) {
+                    const date = new Date(data.last_update);
+                    document.getElementById('updateTime').innerHTML = 
+                        `⏰ 最后更新: ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                }
+                
+                // 渲染分类标签
+                renderCategories();
+                
+                // 渲染资源网格
+                renderResources(allResources);
+                
+                // 隐藏加载动画，显示网格
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resourceGrid').style.display = 'grid';
+                
+            } catch (error) {
+                console.error('加载失败:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        加载失败，请稍后重试
+                    </div>
+                `;
+            }
+        }
+        
+        // 渲染分类标签
+        function renderCategories() {
+            const container = document.getElementById('categories');
+            const categoryNames = Object.keys(categories);
+            
+            if (categoryNames.length === 0) return;
+            
+            let html = '<div class="category-tag active" data-category="all">全部 <span>(' + 
+                       allResources.length + ')</span></div>';
+            
+            categoryNames.forEach(cat => {
+                html += `<div class="category-tag" data-category="${cat}">${cat} <span>(${categories[cat]})</span></div>`;
+            });
+            
+            container.innerHTML = html;
+            
+            // 添加点击事件
+            document.querySelectorAll('.category-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    document.querySelectorAll('.category-tag').forEach(t => 
+                        t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    filterResources();
+                });
+            });
+        }
+        
+        // 渲染资源卡片
+        function renderResources(resources) {
+            const grid = document.getElementById('resourceGrid');
+            
+            if (resources.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #666;">暂无资源</div>';
+                return;
+            }
+            
+            grid.innerHTML = resources.map(item => `
+                <div class="resource-card">
+                    <img class="resource-image" 
+                         src="${item.cover_image || 'https://via.placeholder.com/300x180?text=No+Image'}" 
+                         alt="${item.name}"
+                         onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
+                    <div class="resource-info">
+                        <div class="resource-name">${item.name}</div>
+                        <div class="resource-meta">
+                            <span>${item.version || '未知版本'}</span>
+                            <span>${item.category || '其他'}</span>
+                        </div>
+                        <div class="resource-desc">${item.description || '暂无描述'}</div>
+                    </div>
+                    <a href="${item.download_url || '#'}" 
+                       class="download-btn" 
+                       target="_blank" 
+                       rel="nofollow noopener">
+                        <i class="fas fa-download"></i> 下载
+                    </a>
+                </div>
+            `).join('');
+        }
+        
+        // 过滤资源（按分类和搜索关键词）
+        function filterResources() {
+            const activeCategory = document.querySelector('.category-tag.active')?.dataset.category || 'all';
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            const filtered = allResources.filter(item => {
+                // 分类过滤
+                if (activeCategory !== 'all' && item.category !== activeCategory) {
+                    return false;
+                }
+                
+                // 搜索过滤
+                if (searchTerm) {
+                    return (item.name && item.name.toLowerCase().includes(searchTerm)) ||
+                           (item.description && item.description.toLowerCase().includes(searchTerm));
+                }
+                
+                return true;
+            });
+            
+            renderResources(filtered);
+        }
+        
+        // 搜索输入防抖
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                filterResources();
+            }, 300);
+        });
+        
+        // 页面加载时获取数据
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

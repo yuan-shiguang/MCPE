@@ -1,0 +1,5 @@
+requests==2.31.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+fake-useragent==1.4.0  # 随机User-Agent
+retry==0.9.2           # 重试装饰器
